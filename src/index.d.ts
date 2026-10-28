@@ -17,6 +17,9 @@ export interface ViewerNotice {
 
 export interface MapTilesViewerOptions {
   tilesUrl: string;
+  fetchTiles?: (url: string | URL, options?: RequestInit) => Promise<Response>;
+  constrainToTileset?: boolean;
+  showTilesetBoundary?: boolean;
   basemapPreset?: string;
   basemapStyles?: Record<string, MapStyle | (() => MapStyle)>;
   colormap?: Record<string, unknown> | null;

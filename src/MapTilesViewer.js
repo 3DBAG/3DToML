@@ -133,6 +133,9 @@ export class MapTilesViewer {
 			...options.config
 		};
 		this.tilesUrl = options.tilesUrl;
+		this.fetchTiles = options.fetchTiles;
+		this.constrainToTileset = options.constrainToTileset !== false;
+		this.showTilesetBoundary = options.showTilesetBoundary !== false;
 		this.basemapPreset = options.basemapPreset || 'openfreemap';
 		this.basemapStyles = options.basemapStyles || {};
 		this.basemapStyle = null;
@@ -1024,7 +1027,7 @@ export class MapTilesViewer {
 		if ( west >= east || south >= north ) return;
 		// Constrain both panning and zoom-out to the dataset. MapLibre adjusts
 		// the minimum scale to cover the viewport, including after a resize.
-		if ( this.map ) this.map.setMaxBounds( [[ west, south ], [ east, north ]] );
+		if ( this.map && this.constrainToTileset ) this.map.setMaxBounds( [[ west, south ], [ east, north ]] );
 		const centerLongitude = ( west + east ) / 2;
 		const worldWest = centerLongitude - 180;
 		const worldEast = centerLongitude + 180;
@@ -1069,7 +1072,7 @@ export class MapTilesViewer {
 	}
 	updateTilesetBoundaryLayer() {
 
-		if ( ! this.map || ! this.map.getStyle() || ! this.tilesetBoundary ) return;
+		if ( ! this.showTilesetBoundary || ! this.map || ! this.map.getStyle() || ! this.tilesetBoundary ) return;
 		const source = this.map.getSource( TILESET_BOUNDARY_SOURCE_ID );
 		if ( source ) {
 
@@ -1413,6 +1416,11 @@ export class MapTilesViewer {
 		this.emit( 'tiles-error', null );
 		this.buildingsVisible = this.showBuildingTiles;
 		const tiles = new TilesRenderer( this.tilesUrl );
+		if ( this.fetchTiles ) {
+
+			tiles.registerPlugin( { name: 'HOST_TILE_FETCH', fetchData: this.fetchTiles } );
+
+		}
 		this.tiles = tiles;
 		tiles.group.visible = this.showBuildingTiles;
 		if ( window.matchMedia && window.matchMedia( '(pointer: coarse)' ).matches ) {

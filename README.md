@@ -38,6 +38,9 @@ The container must have a nonzero width and height. Construct the viewer in the 
 | Option | Purpose |
 | --- | --- |
 | `tilesUrl` | URL of the root 3D Tiles `tileset.json`. |
+| `fetchTiles` | Optional `(url, options) => Promise<Response>` request hook for root tilesets and tile content, including nested tilesets. Defaults to the renderer's normal fetch behavior. |
+| `constrainToTileset` | Constrain panning and zoom-out to the active tileset bounds. Defaults to `true`; set to `false` for unrestricted navigation. |
+| `showTilesetBoundary` | Show the outside-area mask and tileset boundary outline. Defaults to `true`; set to `false` to omit both. |
 | `basemapPreset`, `basemapStyles` | Key of the initial map style and an object mapping keys to MapLibre style URLs, style objects, or functions returning styles. Defaults to `openfreemap` and OpenFreeMap Liberty. |
 | `config.mapStyleUrl` | Fallback style URL; defaults to OpenFreeMap Liberty. |
 | `config.terrainTileJsonUrl`, `config.terrainEncoding` | Optional raster DEM TileJSON URL and encoding. No terrain source or hillshade is added unless a URL is supplied. |
@@ -48,6 +51,18 @@ The container must have a nonzero width and height. Construct the viewer in the 
 | `attribution` | Optional custom attribution text or HTML, passed directly to MapLibre. No custom attribution is added by default; map source credits are still shown. |
 | `locale` | Basemap language. |
 | `debugContainer` | Optional element for the development tuning pane. |
+
+The navigation constraint and boundary display are independent constructor options.
+Omitting them preserves the default constrained navigation, outside-area mask, and
+boundary outline. To disable both, pass `constrainToTileset: false` and
+`showTilesetBoundary: false`. These choices also apply after tileset or basemap
+changes.
+
+Use `fetchTiles` to supply request headers or authentication without changing the
+map, terrain, or basemap requests. The hook receives the renderer's request options;
+forward them, including any `AbortSignal`, and return a `Response`. Scope credentials
+to trusted URLs because tile content may reference external resources. The hook is
+installed on each new tiles renderer, including after `setTilesUrl`.
 
 The `setTilesUrl`, `setBasemapPreset`, `setBasemapStyle`, `setColormap`, `setLocale`, `setAttribution`, `setLocations`, `setCameraPosition`, `setTerrainVisibility`, `setHillshadeVisibility`, `setBuildingTilesVisibility`, and `pointCameraToNorth` methods update the running viewer. `setBasemapStyle` accepts a MapLibre style URL or object directly. The React example provides Dutch basemap styles through `@geo-frontend/nlmaps-maplibre`; the engine itself has no dependency on that package.
 
