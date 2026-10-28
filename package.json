@@ -1,0 +1,30 @@
+{
+  "name": "3dtoml",
+  "version": "0.1.0",
+  "description": "3D Tiles on MapLibre",
+  "keywords": ["3d-tiles", "maplibre", "threejs", "geospatial"],
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": ["src", "README.md", "LICENSE", "NOTICE"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3dbag/3dtoml.git"
+  },
+  "peerDependencies": {
+    "@bertt/3dtilesrenderer-styling-plugin": "0.1.0",
+    "3d-tiles-renderer": "0.5.3",
+    "maplibre-gl": "6.15.0",
+    "proj4": "^2.7.2",
+    "three": "0.185.1",
+    "tweakpane": "^1.6.1"
+  }
+}

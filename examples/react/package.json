@@ -1,0 +1,30 @@
+{
+  "name": "3dtoml-react-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "3dtoml": "file:../..",
+    "@bertt/3dtilesrenderer-styling-plugin": "0.1.0",
+    "@geo-frontend/nlmaps-maplibre": "1.0.1",
+    "3d-tiles-renderer": "0.5.3",
+    "maplibre-gl": "6.15.0",
+    "proj4": "^2.7.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "0.185.1",
+    "tweakpane": "^1.6.1"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  },
+  "overrides": {
+    "@geo-frontend/nlmaps-maplibre": {
+      "maplibre-gl": "$maplibre-gl"
+    }
+  }
+}
