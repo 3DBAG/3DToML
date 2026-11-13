@@ -41,8 +41,10 @@ The container must have a nonzero width and height. Construct the viewer in the 
 | `fetchTiles` | Optional `(url, options) => Promise<Response>` request hook for root tilesets and tile content, including nested tilesets. Defaults to the renderer's normal fetch behavior. |
 | `constrainToTileset` | Constrain panning and zoom-out to the active tileset bounds. Defaults to `true`; set to `false` for unrestricted navigation. |
 | `showTilesetBoundary` | Show the outside-area mask and tileset boundary outline. Defaults to `true`; set to `false` to omit both. |
-| `enablePicking` | Enable feature picking by click, Ctrl-hover, or debug hover. Defaults to `true`; set to `false` to disable selection, highlighting, pick events from pointer input, and the picking widget. |
+| `enablePicking` | Enable feature picking by click or hover. Defaults to `true`; set to `false` to disable selection, highlighting, pick events from pointer input, and the picking widget. |
 | `showPickingWidget` | Show the plunger at the picked surface point. Defaults to `true`; set to `false` to hide it while retaining picking, highlighting, and `object-picked` events. |
+| `pickOnHover` | Pick features as the pointer moves, without holding Ctrl. Defaults to `false`; click and Ctrl-hover picking remain available. Requires `enablePicking: true`. |
+| `pickColor` | Selected feature highlight color as a CSS color string or numeric hex value. Defaults to `0xffc107` (yellow). |
 | `basemapPreset`, `basemapStyles` | Key of the initial map style and an object mapping keys to MapLibre style URLs, style objects, or functions returning styles. Defaults to `openfreemap` and OpenFreeMap Liberty. |
 | `config.mapStyleUrl` | Fallback style URL; defaults to OpenFreeMap Liberty. |
 | `config.terrainTileJsonUrl`, `config.terrainEncoding` | Optional raster DEM TileJSON URL and encoding. No terrain source or hillshade is added unless a URL is supplied. |
@@ -66,6 +68,14 @@ any pending pick. Call `setPickingEnabled(true)` to allow new picks. Control the
 plunger independently with `setPickingWidgetVisibility(false)` or
 `setPickingWidgetVisibility(true)`; showing it again restores it at the current
 selection. These settings also apply after tileset or basemap changes.
+
+Pass `pickOnHover: true` to pick on pointer movement, or use
+`setPickOnHover(true)` / `setPickOnHover(false)` to change this at runtime.
+Hover picking also respects `showPickingWidget`.
+
+Set `pickColor: '#00bcd4'` to override the selection highlight, or call
+`setPickColor('#00bcd4')` at runtime. Color changes apply immediately to the current
+selection and future picks, including after tileset or basemap changes.
 
 ```js
 const viewer = new MapTilesViewer(container, {

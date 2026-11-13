@@ -138,6 +138,7 @@ export class MapTilesViewer {
 		this.showTilesetBoundary = options.showTilesetBoundary !== false;
 		this.enablePicking = options.enablePicking !== false;
 		this.showPickingWidget = options.showPickingWidget !== false;
+		this.pickColor = new Color( options.pickColor ?? HIGHLIGHT_COLOR );
 		this.basemapPreset = options.basemapPreset || 'openfreemap';
 		this.basemapStyles = options.basemapStyles || {};
 		this.basemapStyle = null;
@@ -199,7 +200,7 @@ export class MapTilesViewer {
 		this.enableFog = false;
 		this.fogDensity = 0.0000004;
 		this.fogColor = '#eeeeee';
-		this.castOnHover = false;
+		this.castOnHover = options.pickOnHover === true;
 		this.showTerrain = options.showTerrain !== false;
 		this.showHillshade = options.showHillshade !== false;
 		this.showBuildingTiles = options.showBuildingTiles !== false;
@@ -1304,6 +1305,17 @@ export class MapTilesViewer {
 		this.requestRender();
 
 	}
+	setPickOnHover( enabled ) {
+
+		this.castOnHover = enabled;
+
+	}
+	setPickColor( color ) {
+
+		this.pickColor.set( color );
+		this.requestRender();
+
+	}
 	pointCameraToNorth() {
 
 		if ( this.map ) this.map.easeTo( { bearing: 0, duration: 600 } );
@@ -1336,10 +1348,11 @@ export class MapTilesViewer {
 
 		material.userData.highlightedFeatureId = { value: - 1 };
 		material.userData.highlightAttribute = highlightAttribute;
+		material.userData.highlightColor = { value: this.pickColor };
 		material.onBeforeCompile = function ( shader ) {
 
 			shader.uniforms.highlightedFeatureId = this.userData.highlightedFeatureId;
-			shader.uniforms.highlightColor = { value: new Color( HIGHLIGHT_COLOR ) };
+			shader.uniforms.highlightColor = this.userData.highlightColor;
 			shader.vertexShader = `
 				attribute float ${ highlightAttribute };
 				varying float semanticFeatureId;

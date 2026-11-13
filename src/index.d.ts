@@ -22,6 +22,8 @@ export interface MapTilesViewerOptions {
   showTilesetBoundary?: boolean;
   enablePicking?: boolean;
   showPickingWidget?: boolean;
+  pickOnHover?: boolean;
+  pickColor?: string | number;
   basemapPreset?: string;
   basemapStyles?: Record<string, MapStyle | (() => MapStyle)>;
   colormap?: Record<string, unknown> | null;
@@ -65,6 +67,8 @@ export class MapTilesViewer {
   setBuildingTilesVisibility(visible: boolean): void;
   setPickingEnabled(enabled: boolean): void;
   setPickingWidgetVisibility(visible: boolean): void;
+  setPickOnHover(enabled: boolean): void;
+  setPickColor(color: string | number): void;
   pointCameraToNorth(): void;
   destroy(): void;
 }
