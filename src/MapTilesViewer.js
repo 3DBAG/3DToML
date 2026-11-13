@@ -136,6 +136,8 @@ export class MapTilesViewer {
 		this.fetchTiles = options.fetchTiles;
 		this.constrainToTileset = options.constrainToTileset !== false;
 		this.showTilesetBoundary = options.showTilesetBoundary !== false;
+		this.enablePicking = options.enablePicking !== false;
+		this.showPickingWidget = options.showPickingWidget !== false;
 		this.basemapPreset = options.basemapPreset || 'openfreemap';
 		this.basemapStyles = options.basemapStyles || {};
 		this.basemapStyle = null;
@@ -1266,7 +1268,9 @@ export class MapTilesViewer {
 	}
 	updatePickerPosition() {
 
-		if ( ! this.pickerData || ! this.rayIntersect || ! this.rayIntersect.visible ) return;
+		if ( ! this.rayIntersect ) return;
+		this.rayIntersect.visible = this.enablePicking && this.showPickingWidget && Boolean( this.pickerData );
+		if ( ! this.rayIntersect.visible ) return;
 		const tilesFrame = this.getTilesFrame();
 		if ( ! tilesFrame ) return;
 		const { lat, lon, height, east, north, up } = this.pickerData;
@@ -1277,6 +1281,27 @@ export class MapTilesViewer {
 			.addScaledVector( frame.up, up )
 			.normalize();
 		this.rayIntersect.quaternion.setFromUnitVectors( PICKER_LOCAL_NORMAL, normal );
+
+	}
+	setPickingEnabled( enabled ) {
+
+		if ( this.enablePicking === enabled ) return;
+		this.enablePicking = enabled;
+		this.selectionGeneration ++;
+		if ( ! enabled ) {
+
+			this.clearSelection();
+			this.emit( 'object-picked', undefined );
+
+		}
+		this.requestRender();
+
+	}
+	setPickingWidgetVisibility( visible ) {
+
+		this.showPickingWidget = visible;
+		this.updatePickerPosition();
+		this.requestRender();
 
 	}
 	pointCameraToNorth() {
@@ -1363,9 +1388,8 @@ export class MapTilesViewer {
 	}
 	clearSelection() {
 
-		if ( ! this.selectedObject ) return;
-		const materials = Array.isArray( this.selectedObject.material ) ?
-			this.selectedObject.material : [ this.selectedObject.material ];
+		const materials = this.selectedObject ? ( Array.isArray( this.selectedObject.material ) ?
+			this.selectedObject.material : [ this.selectedObject.material ] ) : [];
 		materials.filter( Boolean ).forEach( material => {
 
 			if ( material.userData.highlightedFeatureId ) material.userData.highlightedFeatureId.value = - 1;
@@ -1528,20 +1552,20 @@ export class MapTilesViewer {
 	}
 	onPointerMove( event ) {
 
-		if ( this.tilesError || ! this.buildingsVisible ) return;
+		if ( ! this.enablePicking || this.tilesError || ! this.buildingsVisible ) return;
 		if ( this.castOnHover || event.ctrlKey ) this.castRay( event.clientX, event.clientY, event.altKey ? 5 : 0 );
 
 	}
 	onPointerDown( event ) {
 
-		if ( this.tilesError || ! this.buildingsVisible ) return;
+		if ( ! this.enablePicking || this.tilesError || ! this.buildingsVisible ) return;
 		this.pointerCaster.startClientX = event.clientX;
 		this.pointerCaster.startClientY = event.clientY;
 
 	}
 	onPointerUp( event ) {
 
-		if ( this.tilesError || ! this.buildingsVisible ) return;
+		if ( ! this.enablePicking || this.tilesError || ! this.buildingsVisible ) return;
 		if (
 			this.pointerCaster.startClientX === event.clientX &&
 			this.pointerCaster.startClientY === event.clientY
@@ -1550,7 +1574,7 @@ export class MapTilesViewer {
 	}
 	async castRay( clientX, clientY, snapTolerance = 0 ) {
 
-		if ( ! this.cameraReady || ! this.tiles ) return;
+		if ( ! this.enablePicking || ! this.cameraReady || ! this.tiles ) return;
 		const generation = ++ this.selectionGeneration;
 		const rect = this.map.getCanvas().getBoundingClientRect();
 		this.mouse.x = ( ( clientX - rect.left ) / rect.width ) * 2 - 1;
@@ -1646,7 +1670,6 @@ export class MapTilesViewer {
 			up: normal.dot( surfaceFrame.up )
 		};
 		this.updatePickerPosition();
-		this.rayIntersect.visible = true;
 		const surfaceUp = surfaceFrame.up;
 		const azimuthAngle = Math.acos( Math.min( 1, Math.max( - 1, normal.dot( surfaceUp ) ) ) ) * 180 / Math.PI;
 		const featureHeight = getHeightAboveFeatureBase(

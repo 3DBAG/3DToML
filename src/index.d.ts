@@ -20,6 +20,8 @@ export interface MapTilesViewerOptions {
   fetchTiles?: (url: string | URL, options?: RequestInit) => Promise<Response>;
   constrainToTileset?: boolean;
   showTilesetBoundary?: boolean;
+  enablePicking?: boolean;
+  showPickingWidget?: boolean;
   basemapPreset?: string;
   basemapStyles?: Record<string, MapStyle | (() => MapStyle)>;
   colormap?: Record<string, unknown> | null;
@@ -61,6 +63,8 @@ export class MapTilesViewer {
   setTerrainVisibility(visible: boolean): void;
   setHillshadeVisibility(visible: boolean): void;
   setBuildingTilesVisibility(visible: boolean): void;
+  setPickingEnabled(enabled: boolean): void;
+  setPickingWidgetVisibility(visible: boolean): void;
   pointCameraToNorth(): void;
   destroy(): void;
 }
